@@ -1,5 +1,5 @@
 observability = {
-  kube_prometheus_version = "61.2.0"
+  kube_prometheus_version = "61.3.2"
 }
 
 ### --- Terraform Configuration --- ###
