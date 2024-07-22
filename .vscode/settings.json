@@ -1,0 +1,18 @@
+{
+  "[json]": {
+    "editor.formatOnSave": false,
+    "editor.tabSize": 2
+  },
+  "[terraform]": {
+    "editor.formatOnSave": true,
+    "editor.indentSize": "tabSize",
+    "editor.tabSize": 2
+  },
+  "[terraform-vars]": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "[makefile]": {
+    "editor.insertSpaces": false
+  }
+}
