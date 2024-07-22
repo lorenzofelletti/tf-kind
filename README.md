@@ -16,15 +16,12 @@ make minio-up
     - Locking enabled
     - Versioning enabled.
 
-2. Create another bucket named `cluster-kubeconfig` to store the kubeconfig file for the Kind cluster (which will be useless at the moment,
-because MinIO Terraform provider does not provide a way to read from bucket yet).
+2. Create a user with the necessary permissions to read/write to the buckets (choose the IAM setup that suits your needs best). ([example here](#Example-IAM-Setup))
 
-3. Create a user with the necessary permissions to read/write to the buckets (choose the IAM setup that suits your needs best). ([example here](#Example-IAM-Setup))
-
-4. Create a pair of keys for the user, take note of them and download the `credentials.json` file. Then copy the credentials file
+3. Create a pair of keys for the user, take note of them and download the `credentials.json` file. Then copy the credentials file
 to the root of this repository.
 
-5. `tpl-config.s3.tfbackend` file contains the template that will be used for the S3 backend configuration of each stack. The default configuration
+1. `tpl-config.s3.tfbackend` file contains the template that will be used for the S3 backend configuration of each stack. The default configuration
 is the one tested and working with the codebase. If you want your stacks to use a different configuration, you can edit it. The template configuration
 is used by make to generate the actual configuration for each stack before `init` is run (see the `Makefile` for more details).
 
