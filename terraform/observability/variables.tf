@@ -4,7 +4,7 @@ variable "observability" {
     namespace               = optional(string, "monitoring")
     kube_prometheus_name    = optional(string, "kube-prometheus-stack")
     kube_prometheus_version = string
-    values                  = optional(list(string), [])
+    values                  = optional(list(string))
   })
   nullable = false
 
@@ -15,7 +15,7 @@ variable "observability" {
 
   validation {
     condition = alltrue([
-      for value in var.observability.values : can(yamldecode(value))
+      for value in coalesce(var.observability.values, []) : can(yamldecode(value))
     ])
     error_message = "All values must be valid YAML"
   }
