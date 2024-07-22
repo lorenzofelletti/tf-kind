@@ -32,8 +32,8 @@ minio-down:
 
 .PHONY: tf-backend-config
 tf-backend-config:
-	@export ACCESS_KEY=$$(cat $(MINIO_DIR)/$(MINIO_CREDENTIALS_FILE) | jq -r '.accessKey'); \
-	export SECRET_KEY=$$(cat $(MINIO_DIR)/$(MINIO_CREDENTIALS_FILE) | jq -r '.secretKey'); \
+	@export ACCESS_KEY=$$(cat $(MINIO_CREDENTIALS_FILE) | jq -r '.accessKey'); \
+	export SECRET_KEY=$$(cat $(MINIO_CREDENTIALS_FILE) | jq -r '.secretKey'); \
 	for dir in $$(find $(TERRAFORM_DIR) -maxdepth 1 -mindepth 1 -type d ! -name "modules"); do \
 		export STACK=$$(echo -n "$$dir" | rev | cut -f1 -d/ | rev); \
 		envsubst < $(TF_BACKEND_CFG_TPL) > "$$dir/$(TF_BACKEND_CFG_NAME)"; \
@@ -143,7 +143,7 @@ destroy:
 
 
 define cp-minio-creds
-	cp $(MINIO_DIR)/$(MINIO_CREDENTIALS_FILE) $(1)/$(MINIO_CREDENTIALS_FILE)
+	cp $(MINIO_CREDENTIALS_FILE) $(1)/$(MINIO_CREDENTIALS_FILE)
 endef
 
 define terraform-validate

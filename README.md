@@ -89,4 +89,4 @@ make apply STACK=observability ARGS="-var-file=dev.tfvars"
       },
     ]
     ```
-  - Then clicink on the *Update* button.
+  - Then clicking on the *Update* button.
