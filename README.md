@@ -34,7 +34,7 @@ Run the following command to create the cluster:
 # file path is relative to the terraform/kind-cluster directory
 make init STACK=kind ARGS="-backend-config=config.s3.tfbackend"
 make plan STACK=kind ARGS="-var-file=dev.tfvars"
-make apply STACK=kind ARGS="-var-file=dev.tfvars"
+make apply STACK=kind
 ```
 
 ### Setup Prometheus And Grafana
@@ -42,7 +42,7 @@ Once that the cluster is created, run the following command to set up Prometheus
 ```bash
 make init STACK=observability ARGS="-backend-config=config.s3.tfbackend"
 make plan STACK=observability ARGS="-var-file=dev.tfvars"
-make apply STACK=observability ARGS="-var-file=dev.tfvars"
+make apply STACK=observability
 ```
 
 ---
