@@ -63,7 +63,7 @@ module "expose-minio-network" {
   source = "../modules/expose-network"
 
   network_name = "minio"
-  ports        = "9000-9001"
+  ports        = "9000"
 
   depends_on = [kind_cluster.this]
 }

@@ -4,8 +4,46 @@ resource "helm_release" "velero" {
   version          = var.velero.version
   repository       = "https://vmware-tanzu.github.io/helm-charts"
   chart            = "velero"
-  values           = var.velero.values
+  values           = var.velero.values_file != null ? [file(pathexpand(var.velero.values_file))] : var.velero.values
   create_namespace = true
+}
+
+resource "kubernetes_secret_v1" "name" {
+  metadata {
+    name      = "velero-credentials"
+    namespace = "velero"
+  }
+  type = "Opaque"
+  data = {
+    cloud = local.minio_secret_data
+  }
+
+  depends_on = [helm_release.velero]
+}
+
+
+### --- Terraform Configuration --- ###
+data "terraform_remote_state" "cluster" {
+  backend = "s3"
+
+  config = {
+    access_key = module.minio-provider.configuration.access_key
+    secret_key = module.minio-provider.configuration.secret_key
+
+    endpoints = {
+      s3 = var.cluster_remote_state.endpoint
+    }
+
+    region                      = var.cluster_remote_state.region
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    use_path_style              = true
+
+    bucket = var.cluster_remote_state.bucket
+    key    = var.cluster_remote_state.key
+  }
 }
 
 module "kube" {

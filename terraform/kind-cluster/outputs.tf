@@ -8,3 +8,8 @@ output "cluster_provider" {
   description = "Provider of the cluster"
   value       = "local"
 }
+
+output "minio_kubernetes_service" {
+  description = "Kubernetes service exposing MinIO"
+  value       = try(module.expose-minio-network[0].service, null)
+}

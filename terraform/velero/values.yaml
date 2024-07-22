@@ -1,0 +1,42 @@
+configuration:
+  uploaderType: restic
+  backupStorageLocation:
+    - bucket: velero
+  name: velero
+  provider: aws
+  prefix: backups
+  default: true
+  config:
+  region: "{{MINIO_REGION}}"
+  s3ForcePathStyle: true
+  s3Url: "http://{{VELERO_SVC_HOST}}:{{VELERO_SVC_PORT}}"
+  volumeSnapshotLocation: []
+    # - config:
+    #   region: minio
+    #   s3ForcePathStyle: true
+    #   s3Url: "http://{{VELERO_SVC_HOST}}:{{VELERO_SVC_PORT}}"
+    #   provider: aws
+
+snapshotsEnabled: false
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:{{PLUGIN_VERSION}}
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+metrics:
+      enabled: true
+      scrapeInterval: 30s
+      scrapeTimeout: 10s
+      serviceMonitor:
+        enabled: true
+        autodetect: false
+        namaspace: velero
+        additionalLabels:
+          Release: kube-prometheus-stack
+
+credentials:
+  useSecret: true
+  existingSecret: velero-credentials

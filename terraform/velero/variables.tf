@@ -1,8 +1,9 @@
 variable "velero" {
   description = "Velero chart configuration"
   type = object({
-    version = string
-    values  = optional(list(string), [])
+    version     = string
+    values      = optional(list(string), [])
+    values_file = optional(string)
   })
 }
 
@@ -62,4 +63,20 @@ variable "minio_server" {
   description = "The MinIO server to use (e.g. localhost:9000)"
   type        = string
   default     = "localhost:9000"
+}
+
+variable "cluster_remote_state" {
+  description = "Remote state configuration for the cluster."
+  type = object({
+    region   = string
+    endpoint = string
+    bucket   = string
+    key      = string
+  })
+  default = {
+    region   = "main"
+    endpoint = "http://localhost:9000"
+    bucket   = "terraform-states"
+    key      = "kind-cluster/terraform.tfstate"
+  }
 }
