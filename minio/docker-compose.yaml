@@ -11,6 +11,8 @@ services:
     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     networks:
     - proxy
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
     ports:
     - "9000:9000"
     - "9001:9001"

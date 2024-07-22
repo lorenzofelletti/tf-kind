@@ -16,6 +16,7 @@ resource "kubernetes_deployment_v1" "network" {
         labels    = local.labels
       }
       spec {
+        host_network = true
         container {
           name  = "expose-network"
           image = "qoomon/docker-host"
@@ -24,14 +25,26 @@ resource "kubernetes_deployment_v1" "network" {
               add = ["NET_ADMIN", "NET_RAW"]
             }
           }
-          # env {
-          #   name  = "DOCKER_HOST"
-          #   value = var.network_gateway
-          # }
-          # env {
-          #   name  = "PORTS"
-          #   value = var.ports
-          # }
+
+          dynamic "env" {
+            for_each = var.network_gateway != null ? toset(["this"]) : toset([])
+            content {
+              name  = "DOCKER_HOST"
+              value = var.network_gateway
+            }
+          }
+          env {
+            name  = "PORTS"
+            value = var.ports
+          }
+          dynamic "port" {
+            for_each = local.ports
+            content {
+              container_port = port.value
+              host_port      = port.value
+              protocol       = "TCP"
+            }
+          }
         }
       }
     }
@@ -46,16 +59,15 @@ resource "kubernetes_service_v1" "network" {
   spec {
     cluster_ip = "None"
     selector   = local.labels
-  }
-}
 
-resource "kubernetes_service_v1" "external_name" {
-  metadata {
-    name      = "minio"
-    namespace = "kube-system"
-  }
-  spec {
-    type          = "ExternalName"
-    external_name = "host.docker.internal"
+    dynamic "port" {
+      for_each = local.ports
+      content {
+        name        = "port-${port.key}"
+        port        = port.value
+        target_port = port.value
+        protocol    = "TCP"
+      }
+    }
   }
 }

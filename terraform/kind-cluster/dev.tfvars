@@ -2,10 +2,10 @@ cluster_spec = {
   name        = "observability-test"
   k8s_version = "1.30.0"
   networking = {
-    ip_family           = "ipv4"
-    disable_default_cni = true
-    install_calico      = true
-    pod_subnet          = "192.168.0.0/16"
+    ip_family = "ipv4"
+    # disable_default_cni = true
+    # install_calico      = true
+    pod_subnet = "192.168.0.0/16"
   }
   nodes = {
     "cp" = {
@@ -19,10 +19,9 @@ cluster_spec = {
 
 expose_minio_in_cluster = {
   enabled = true
-  network = "proxy"
 }
 
-calico_version = "v3.28.0"
+# calico_version = "v3.28.0"
 
 kubeconfig_path = "~/.kube/kind-config"
 

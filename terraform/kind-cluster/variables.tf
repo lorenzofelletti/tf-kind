@@ -105,10 +105,9 @@ variable "expose_minio_in_cluster" {
   description = <<-EOT
   Expose MinIO in the cluster
   Fields:
-  - enabled: Enable exposing MinIO in the cluster
-  - gateway: The gateway to use to expose MinIO in the cluster
-  - network: The network to use to expose MinIO in the cluster.
-  Either gateway or network must be set. If network is set, Terraform will try to find the gateway automatically.
+  - enabled: Enable exposing MinIO in the cluster (default: `false`)
+  - gateway: The gateway to use to expose MinIO in the cluster (optional)
+  - network: The network to use to expose MinIO in the cluster (optional).
   EOT
   type = object({
     enabled = optional(bool, false)

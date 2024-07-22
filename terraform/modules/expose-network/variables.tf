@@ -21,7 +21,7 @@ variable "ports" {
 variable "network_gateway" {
   description = "The gateway to use to expose the network"
   type        = string
-  nullable    = false
+  default     = null
 }
 
 variable "labels" {

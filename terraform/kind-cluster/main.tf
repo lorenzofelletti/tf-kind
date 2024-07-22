@@ -62,9 +62,8 @@ module "expose-minio-network" {
   count  = var.expose_minio_in_cluster.enabled ? 1 : 0
   source = "../modules/expose-network"
 
-  network_name    = "minio"
-  network_gateway = local.minio_network_geteway
-  ports           = "9000-9001"
+  network_name = "minio"
+  ports        = "9000-9001"
 
   depends_on = [kind_cluster.this]
 }
