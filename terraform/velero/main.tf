@@ -10,7 +10,13 @@ resource "helm_release" "velero" {
   depends_on = [kubernetes_namespace_v1.velero, kubernetes_secret_v1.velero]
 }
 
-resource "kubernetes_secret_v1" "name" {
+resource "kubernetes_namespace_v1" "velero" {
+  metadata {
+    name = "velero"
+  }
+}
+
+resource "kubernetes_secret_v1" "velero" {
   metadata {
     name      = "velero-credentials"
     namespace = "velero"
@@ -20,7 +26,7 @@ resource "kubernetes_secret_v1" "name" {
     cloud = local.minio_secret_data
   }
 
-  depends_on = [helm_release.velero]
+  depends_on = [kubernetes_namespace_v1.velero]
 }
 
 
