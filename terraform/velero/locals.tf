@@ -7,10 +7,10 @@ locals {
   )
 
   __values = var.velero.values_file != null ? [file(pathexpand(var.velero.values_file))] : var.velero.values
-  values = [for v in local.__values : replace(replace(replace(replace(v,
-    "{{PLUGIN_VERSION}}", "v1.10.0"),
-    "{{MINIO_REGION}}", "main"),
-    "{{VELERO_SVC_HOST}}", data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.default_hostname),
-    "{{VELERO_SVC_PORT}}", data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.ports[0].port
-  )]
+  values = [for v in local.__values : templatestring(v, {
+    plugin_version  = "v1.10.0",
+    minio_region    = "main",
+    velero_svc_host = data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.default_hostname,
+    velero_svc_port = data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.ports[0].port
+  })]
 }

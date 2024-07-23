@@ -7,16 +7,16 @@ configuration:
     prefix: backups
     default: true
     config:
-      region: "{{MINIO_REGION}}"
+      region: "${minio_region}"
       s3ForcePathStyle: true
-      s3Url: "http://{{VELERO_SVC_HOST}}:{{VELERO_SVC_PORT}}"
+      s3Url: "http://${velero_svc_host}:${velero_svc_port}"
   volumeSnapshotLocation: []
 
 snapshotsEnabled: false
 
 initContainers:
 - name: velero-plugin-for-aws
-  image: velero/velero-plugin-for-aws:{{PLUGIN_VERSION}}
+  image: velero/velero-plugin-for-aws:${plugin_version}
   volumeMounts:
   - mountPath: /target
     name: plugins
