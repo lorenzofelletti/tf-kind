@@ -4,8 +4,10 @@ resource "helm_release" "velero" {
   version          = var.velero.version
   repository       = "https://vmware-tanzu.github.io/helm-charts"
   chart            = "velero"
-  values           = var.velero.values_file != null ? [file(pathexpand(var.velero.values_file))] : var.velero.values
-  create_namespace = true
+  values           = local.values
+  create_namespace = false
+
+  depends_on = [kubernetes_namespace_v1.velero, kubernetes_secret_v1.velero]
 }
 
 resource "kubernetes_secret_v1" "name" {
