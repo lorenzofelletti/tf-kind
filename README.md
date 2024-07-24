@@ -1,6 +1,8 @@
-# Kubernetes Observability
-Spin up a Kubernetes cluster with Prometheus and Grafana installed using Docker, and Terraform.
-The repo provides IaC to create a Kubernetes cluster using Kind, but the Prometheus and Grafana setup can be used with any Kubernetes cluster.
+# Local Kubernetes cluster with Prometheus, Grafana, and Velero
+> The most convoluted, and over-engineered way to spin up a local Kubernetes cluster.
+
+Spin up a Kubernetes cluster with Prometheus, Grafana, and Velero installed using Docker, and Terraform.
+The repo provides IaC to create a Kubernetes cluster using Kind, but the Prometheus and Grafana setup can be used with any Kubernetes cluster. The Velero setup is mildly coupled with the Kind cluster, so it is not that portable.
 
 ## Setup MinIO
 Run the following command to start MinIO:
@@ -43,6 +45,14 @@ Once that the cluster is created, run the following command to set up Prometheus
 make init STACK=observability ARGS="-backend-config=config.s3.tfbackend"
 make plan STACK=observability ARGS="-var-file=dev.tfvars"
 make apply STACK=observability
+```
+
+### Setup Velero
+Once that the cluster is created, run the following command to set up Velero:
+```bash
+make init STACK=velero ARGS="-backend-config=config.s3.tfbackend"
+make plan STACK=velero ARGS="-var-file=dev.tfvars"
+make apply STACK=velero
 ```
 
 ---
