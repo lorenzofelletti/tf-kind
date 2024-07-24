@@ -62,7 +62,10 @@ module "expose-minio" {
   count  = var.expose_minio_in_cluster.enabled ? 1 : 0
   source = "../modules/expose-external"
 
-  name               = "minio"
+  name             = "minio"
+  namespace        = "minio"
+  create_namespace = true
+
   ports              = "9000"
   nginx_default_conf = <<-EOT
   server {

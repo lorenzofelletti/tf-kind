@@ -11,6 +11,18 @@ variable "namespace" {
   nullable    = false
 }
 
+variable "create_namespace" {
+  description = "Whether to create the namespace if it does not exist"
+  type        = bool
+  default     = false
+  nullable    = false
+
+  validation {
+    condition     = var.create_namespace == true ? var.namespace != "kube-system" : true
+    error_message = "Namespace kube-system cannot be created."
+  }
+}
+
 variable "ports" {
   description = "The ports to expose on the network"
   type        = string

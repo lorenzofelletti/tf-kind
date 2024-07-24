@@ -48,6 +48,8 @@ resource "kubernetes_deployment_v1" "network" {
       }
     }
   }
+
+  depends_on = [kubernetes_namespace_v1.this]
 }
 
 resource "kubernetes_service_v1" "network" {
@@ -78,5 +80,12 @@ resource "kubernetes_config_map_v1" "nginx-config" {
   }
   data = {
     "default.conf" = var.nginx_default_conf
+  }
+}
+
+resource "kubernetes_namespace_v1" "this" {
+  count = var.create_namespace ? 1 : 0
+  metadata {
+    name = var.namespace
   }
 }
