@@ -30,7 +30,7 @@ metrics:
     autodetect: false
     namaspace: velero
     additionalLabels:
-      Release: kube-prometheus-stack
+      release: kube-prometheus-stack
 
 credentials:
   useSecret: true
