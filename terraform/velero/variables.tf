@@ -7,6 +7,13 @@ variable "velero" {
   })
 }
 
+variable "bucket_name" {
+  description = "The name of the bucket where Velero backups will be stored."
+  type        = string
+  default     = "velero-backups"
+  nullable    = false
+}
+
 ### --- Terraform Configuration --- ###
 
 variable "kubeconfig" {

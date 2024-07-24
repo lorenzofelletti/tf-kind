@@ -1,7 +1,7 @@
 configuration:
   uploaderType: restic
   backupStorageLocation:
-  - bucket: velero
+  - bucket: ${backup_bucket}
     name: velero
     provider: aws
     prefix: backups
