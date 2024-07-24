@@ -29,6 +29,10 @@ resource "kubernetes_secret_v1" "velero" {
   depends_on = [kubernetes_namespace_v1.velero]
 }
 
+resource "minio_s3_bucket" "velero_backups" {
+  bucket        = var.bucket_name
+  force_destroy = false
+}
 
 ### --- Terraform Configuration --- ###
 data "terraform_remote_state" "cluster" {
