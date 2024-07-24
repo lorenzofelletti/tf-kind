@@ -58,12 +58,37 @@ data "docker_network" "minio" {
   name  = var.expose_minio_in_cluster.network
 }
 
-module "expose-minio-network" {
+module "expose-minio" {
   count  = var.expose_minio_in_cluster.enabled ? 1 : 0
-  source = "../modules/expose-network"
+  source = "../modules/expose-external"
 
-  network_name = "minio"
-  ports        = "9000"
+  name               = "minio"
+  ports              = "9000"
+  nginx_default_conf = <<-EOT
+  server {
+    listen 9000;
+    server_name host.docker.internal
+    # Allow special characters in headers
+    ignore_invalid_headers off;
+    # Allow any size file to be uploaded.
+    # Set to a value such as 1000m; to restrict file size to a specific value
+    client_max_body_size 0;
+    # Disable buffering
+    proxy_buffering off;
+    proxy_request_buffering off;
+
+    location / {
+      proxy_pass http://host.docker.internal:9000;
+      proxy_set_header Host $http_host;
+      #proxy_pass_request_headers off;
+      #proxy_buffering off;
+      chunked_transfer_encoding off;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+  }
+  EOT
 
   depends_on = [kind_cluster.this]
 }
