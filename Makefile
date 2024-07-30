@@ -143,7 +143,7 @@ destroy:
 
 
 define cp-minio-creds
-	cp $(MINIO_CREDENTIALS_FILE) $(1)/$(MINIO_CREDENTIALS_FILE)
+	cp $(MINIO_CREDENTIALS_FILE) $(MINIO_CREDENTIALS_FILE)
 endef
 
 define terraform-validate
