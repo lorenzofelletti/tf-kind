@@ -24,16 +24,8 @@ variable "kubeconfig" {
   })
 
   validation {
-    condition = !alltrue([
-      var.kubeconfig.local == null,
-      var.kubeconfig.remote == null
-    ])
-    error_message = "One of local or remote must be set. They cannot be both unset."
-  }
-
-  validation {
-    condition     = var.kubeconfig.local != null || var.kubeconfig.remote != null
-    error_message = "Either local_kubeconfig_path or remote_kubeconfig_path must be set, but not both."
+    condition     = provider::logic::xor(var.kubeconfig.local != null, var.kubeconfig.remote != null)
+    error_message = "One of local or remote must be set, but not both."
   }
 
   validation {

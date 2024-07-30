@@ -14,10 +14,16 @@ terraform {
       source  = "aminueza/minio"
       version = "~> 2.4.0"
     }
+    logic = {
+      source  = "logicorg/logic"
+      version = "~> 0.1.0"
+    }
   }
 
   backend "s3" {}
 }
+
+provider "logic" {}
 
 provider "kubernetes" {
   config_path            = module.kube.configuration.config_path
