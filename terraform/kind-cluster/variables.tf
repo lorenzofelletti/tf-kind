@@ -7,13 +7,14 @@ variable "cluster_spec" {
     containerd_config_patches = optional(list(string), [])
     nodes = optional(map(object({
       role                   = optional(string, "worker")
+      ingress_ready          = optional(bool, false)
       kubeadm_config_patches = optional(list(string), [])
-      extra_port_mappings = optional(object({
-        container_port = optional(number)
-        host_port      = optional(number)
+      extra_port_mappings = optional(list(object({
+        container_port = number
+        host_port      = number
         listen_address = optional(string)
         protocol       = optional(string)
-      }))
+      })), [])
     })), {})
     networking = optional(object({
       apiserver_port      = optional(number, null)
@@ -38,6 +39,11 @@ variable "cluster_spec" {
   validation {
     condition     = alltrue([for node in values(var.cluster_spec.nodes) : contains(["control-plane", "worker"], node.role)])
     error_message = "cluster_spec.nodes[*].role should be either `control-plane` or `worker`"
+  }
+
+  validation {
+    condition     = length(keys(var.cluster_spec.nodes)) == 0 || anytrue([for node in values(var.cluster_spec.nodes) : node.role == "control-plane"])
+    error_message = "When cluster_spec.nodes is set, at least one node in it must have role `control-plane`"
   }
 
   validation {
@@ -77,6 +83,13 @@ variable "cluster_spec" {
   validation {
     condition     = try(!var.cluster_spec.networking.install_calico || var.cluster_spec.networking.disable_default_cni, true)
     error_message = "cluster_spec.networking.install_calico is `true` but cluster_spec.networking.disable_default_cni is `false`"
+  }
+
+  validation {
+    condition = alltrue([for node in values(var.cluster_spec.nodes) : (
+      !node.ingress_ready || length(node.kubeadm_config_patches) == 0
+    )])
+    error_message = "When node.ingress_ready is `true`, node.kubeadm_config_patches must be set to an empty list or not set."
   }
 }
 

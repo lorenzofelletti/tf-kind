@@ -9,7 +9,18 @@ cluster_spec = {
   }
   nodes = {
     "cp" = {
-      role = "control-plane"
+      role          = "control-plane"
+      ingress_ready = true
+      extra_port_mappings = [
+        {
+          container_port = 80
+          host_port      = 80
+        },
+        {
+          container_port = 443
+          host_port      = 443
+        }
+      ]
     },
     "w1" = {
       role = "worker"

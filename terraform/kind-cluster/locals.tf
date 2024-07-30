@@ -5,6 +5,13 @@ locals {
     var.cluster_spec.networking != null
   )
 
+  ingress_kubeadm_patch = <<-EOT
+  kind: InitConfiguration
+  nodeRegistration:
+    kubeletExtraArgs:
+      node-labels: "ingress-ready=true"
+  EOT
+
   minio_network_geteway = (
     var.expose_minio_in_cluster.enabled &&
     var.expose_minio_in_cluster.network != null

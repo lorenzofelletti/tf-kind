@@ -18,18 +18,24 @@ terraform {
       source  = "kreuzwerker/docker"
       version = "~> 3.0.2"
     }
+    logic = {
+      source  = "logicorg/logic"
+      version = "~> 0.1.0"
+    }
   }
 
   backend "s3" {}
 }
+
+provider "logic" {}
 
 provider "docker" {}
 
 provider "kind" {}
 
 provider "kubernetes" {
-  config_path = kind_cluster.this.kubeconfig_path
-  # config_context = "kind-${kind_cluster.this.name}"
+  config_path    = kind_cluster.this.kubeconfig_path
+  config_context = "kind-${kind_cluster.this.name}"
 }
 
 provider "minio" {

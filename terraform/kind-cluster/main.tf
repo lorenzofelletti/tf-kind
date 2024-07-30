@@ -28,16 +28,20 @@ resource "kind_cluster" "this" {
       dynamic "node" {
         for_each = var.cluster_spec.nodes
         content {
-          role                   = node.value.role
-          image                  = "kindest/node:v${var.cluster_spec.k8s_version}"
-          kubeadm_config_patches = node.value.kubeadm_config_patches
+          role  = node.value.role
+          image = "kindest/node:v${var.cluster_spec.k8s_version}"
+          kubeadm_config_patches = (node.value.ingress_ready ?
+            [local.ingress_kubeadm_patch] :
+            node.value.kubeadm_config_patches
+          )
+
           dynamic "extra_port_mappings" {
-            for_each = node.value.extra_port_mappings != null ? toset(["this"]) : toset([])
+            for_each = toset(node.value.extra_port_mappings)
             content {
-              container_port = node.value.extra_port_mappings.container_port
-              host_port      = node.value.extra_port_mappings.host_port
-              listen_address = node.value.extra_port_mappings.listen_address
-              protocol       = node.value.extra_port_mappings.protocol
+              container_port = extra_port_mappings.value.container_port
+              host_port      = extra_port_mappings.value.host_port
+              listen_address = extra_port_mappings.value.listen_address
+              protocol       = extra_port_mappings.value.protocol
             }
           }
         }
