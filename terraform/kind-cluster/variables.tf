@@ -136,6 +136,16 @@ variable "kubeconfig_path" {
   nullable    = false
 }
 
+# variable "minio_root_user" {
+#   description = "The MinIO root user. Used to bootstrap the MinIO Service Account used by Terraform."
+#   type        = string
+# }
+
+# variable "minio_root_password" {
+#   description = "The MinIO root password. Used to bootstrap the MinIO Service Account used by Terraform."
+#   type        = string
+# }
+
 variable "minio_key_file" {
   description = "Path to the file containing the MinIO access key and secret key"
   type        = string

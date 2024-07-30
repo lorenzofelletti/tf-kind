@@ -43,3 +43,10 @@ provider "minio" {
   minio_user     = module.minio-provider.configuration.access_key
   minio_password = module.minio-provider.configuration.secret_key
 }
+
+# provider "minio" {
+#   alias = "bootstrap"
+
+#   minio_user     = var.minio_root_user
+#   minio_password = var.minio_root_password
+# }

@@ -11,8 +11,9 @@ TERRAFORM_KIND_CLUSTER_DIR = $(TERRAFORM_DIR)/kind-cluster
 TERRAFORM_OBSERVABILITY_DIR = $(TERRAFORM_DIR)/observability
 TERRAFORM_VELERO_DIR = $(TERRAFORM_DIR)/velero
 
+TF_MINIO_AUTO_TF_VARS_TPL = tpl-minio.auto.tfvars
 TF_BACKEND_CFG_TPL = tpl-config.s3.tfbackend
-TF_BACKEND_CFG_NAME=config.s3.tfbackend
+TF_BACKEND_CFG_NAME = config.s3.tfbackend
 TF_PLAN_FILE = terraform.tfplan
 
 .PHONY: minio-up
@@ -39,8 +40,17 @@ tf-backend-config:
 		envsubst < $(TF_BACKEND_CFG_TPL) > "$$dir/$(TF_BACKEND_CFG_NAME)"; \
 	done
 
+.PHONY: auto-tf-vars
+auto-tf-vars:
+	@if [[ -f $(MINIO_DIR)/$(MINIO_ENV_FILE) ]]; then \
+		source $(MINIO_DIR)/$(MINIO_ENV_FILE); \
+	else \
+		source $(MINIO_DIR)/$(MINIO_DEFAULT_ENV_FILE); \
+	fi; envsubst < $(TF_MINIO_AUTO_TF_VARS_TPL) > $(TERRAFORM_DIR)/$(TERRAFORM_KIND_CLUSTER_DIR)/minio.auto.tfvars
+
+
 .PHONY: init
-init: tf-backend-config
+init: tf-backend-config # auto-tf-vars
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-init, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -79,7 +89,7 @@ fmt-all:
 	$(call terraform-fmt, $(TERRAFORM_OBSERVABILITY_DIR))
 
 .PHONY: console
-console:
+console: # auto-tf-vars
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-console, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -103,7 +113,7 @@ tf-test:
 	fi
 
 .PHONY: plan
-plan:
+plan: # auto-tf-vars
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call cp-minio-creds, $(TERRAFORM_KIND_CLUSTER_DIR)); \
 		$(call terraform-plan, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
@@ -118,7 +128,7 @@ plan:
 	fi
 
 .PHONY: apply
-apply:
+apply: # auto-tf-vars
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-apply, $(TERRAFORM_KIND_CLUSTER_DIR)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
