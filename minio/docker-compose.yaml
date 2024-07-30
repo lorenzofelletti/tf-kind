@@ -1,6 +1,7 @@
 services:
   minio:
     image: quay.io/minio/minio:${MINIO_TAG}
+    restart: always
     command:
     - server
     - /datacurl
