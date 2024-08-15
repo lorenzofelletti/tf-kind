@@ -40,7 +40,7 @@ tf-backend-config:
 	done
 
 .PHONY: init
-init: tf-backend-config
+init: tf-backend-config propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-init, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -52,7 +52,7 @@ init: tf-backend-config
 	fi
 
 .PHONY: validate
-validate:
+validate: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-validate, $(TERRAFORM_KIND_CLUSTER_DIR)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -77,9 +77,10 @@ fmt:
 fmt-all:
 	$(call terraform-fmt, $(TERRAFORM_KIND_CLUSTER_DIR))
 	$(call terraform-fmt, $(TERRAFORM_OBSERVABILITY_DIR))
+	$(call terraform-fmt, $(TERRAFORM_VELERO_DIR))
 
 .PHONY: console
-console:
+console: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-console, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -91,7 +92,7 @@ console:
 	fi
 
 .PHONY: tf-test
-tf-test:
+tf-test: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-test, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -103,22 +104,19 @@ tf-test:
 	fi
 
 .PHONY: plan
-plan:
+plan: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
-		$(call cp-minio-creds, $(TERRAFORM_KIND_CLUSTER_DIR)); \
 		$(call terraform-plan, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
-		$(call cp-minio-creds, $(TERRAFORM_OBSERVABILITY_DIR)); \
 		$(call terraform-plan, $(TERRAFORM_OBSERVABILITY_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "velero" ]]; then \
-		$(call cp-minio-creds, $(TERRAFORM_VELERO_DIR)); \
 		$(call terraform-plan, $(TERRAFORM_VELERO_DIR), $(ARGS)); \
 	else \
 		echo "Invalid STACK value. Must be one of kind, observability (abbr. obs), and velero."; \
 	fi
 
 .PHONY: apply
-apply:
+apply: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call terraform-apply, $(TERRAFORM_KIND_CLUSTER_DIR)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -130,7 +128,7 @@ apply:
 	fi
 
 .PHONY: destroy
-destroy:
+destroy: propagate-minio-creds
 	@if [[ $(STACK) == "kind" ]]; then \
 		$(call destroy, $(TERRAFORM_KIND_CLUSTER_DIR), $(ARGS)); \
 	elif [[ $(STACK) == "observability" || $(STACK) == "obs" ]]; then \
@@ -141,9 +139,14 @@ destroy:
 		echo "Invalid STACK value. Must be one of kind, observability (abbr. obs), and velero."; \
 	fi
 
+.PHONY: propagate-minio-creds
+propagate-minio-creds:
+	@$(call cp-minio-creds, $(TERRAFORM_KIND_CLUSTER_DIR))
+	@$(call cp-minio-creds, $(TERRAFORM_OBSERVABILITY_DIR))
+	@$(call cp-minio-creds, $(TERRAFORM_VELERO_DIR))
 
 define cp-minio-creds
-	cp $(MINIO_CREDENTIALS_FILE) $(MINIO_CREDENTIALS_FILE)
+	cp $(MINIO_CREDENTIALS_FILE) $(1)
 endef
 
 define terraform-validate
