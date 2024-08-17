@@ -111,6 +111,35 @@ module "calico" {
   additional_replace_trigger = [kind_cluster.this.kubeconfig]
 }
 
+resource "terraform_data" "ingress-nginx" {
+  count = var.cluster_spec.deploy_ingress_nginx ? 1 : 0
+
+  provisioner "local-exec" {
+    command = <<-EOT
+    set -euo pipefail
+
+    export KUBECONFIG=$KUBECONFIG
+    kubectl config use-context $CONTEXT
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
+
+    kubectl wait --namespace ingress-nginx \
+      --for=condition=ready pod \
+      --selector=app.kubernetes.io/component=controller \
+      --timeout=90s
+    EOT
+
+    environment = {
+      "KUBECONFIG" = local.kubeconfig_path
+      "CONTEXT"    = local.context_name
+    }
+
+    when       = create
+    on_failure = continue
+  }
+
+  triggers_replace = sha256(kind_cluster.this.kubeconfig)
+}
+
 module "upload_kubeconfig" {
   source = "../modules/upload-to-minio"
   count  = var.kubeconfig_upload_bucket_name != null ? 1 : 0

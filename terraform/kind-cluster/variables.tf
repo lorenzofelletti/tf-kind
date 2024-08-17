@@ -24,6 +24,7 @@ variable "cluster_spec" {
       pod_subnet          = optional(string, null)
       service_subnet      = optional(string, null)
     }), null)
+    deploy_ingress_nginx = optional(bool, false)
   })
   default = {
     k8s_version = "1.30.0"

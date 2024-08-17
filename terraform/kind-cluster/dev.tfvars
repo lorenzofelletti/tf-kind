@@ -7,6 +7,7 @@ cluster_spec = {
     install_calico      = true
     pod_subnet          = "192.168.0.0/16"
   }
+  deploy_ingress_nginx = true
   nodes = {
     "cp" = {
       role          = "control-plane"
