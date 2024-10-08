@@ -29,6 +29,11 @@ cluster_spec = {
   }
 }
 
+deploy_local_registry = true
+local_registry_spec = {
+  add_cluster_containerd_config_patch = true
+}
+
 expose_minio_in_cluster = {
   enabled = true
 }

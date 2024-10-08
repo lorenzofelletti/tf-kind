@@ -94,6 +94,28 @@ variable "cluster_spec" {
   }
 }
 
+variable "deploy_local_registry" {
+  description = "Deploy a local registry in the cluster"
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
+variable "local_registry_spec" {
+  description = "Specs of the local registry. Ignored if deploy_local_registry is `false`"
+  type = object({
+    name                                = optional(string, "registry")
+    registry_port                       = optional(number, 5001)
+    registry_container_port             = optional(number, 5000)
+    add_cluster_containerd_config_patch = optional(bool, false)
+  })
+  default = {
+    name                    = "registry"
+    registry_port           = 5001
+    registry_container_port = 5000
+  }
+}
+
 variable "calico_version" {
   description = "The version of Calico to install, if you chose to install Calico in the cluster"
   type        = string
