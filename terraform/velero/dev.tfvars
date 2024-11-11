@@ -1,5 +1,5 @@
 velero = {
-  version     = "v7.1.1"
+  version     = "v7.2.2"
   values_file = "values.yaml"
 }
 

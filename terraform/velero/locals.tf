@@ -8,7 +8,7 @@ locals {
 
   __values = var.velero.values_file != null ? [file(pathexpand(var.velero.values_file))] : var.velero.values
   values = [for v in local.__values : templatestring(v, {
-    plugin_version  = "v1.10.0",
+    plugin_version  = "v1.10.1",
     backup_bucket   = var.bucket_name,
     minio_region    = "main",
     velero_svc_host = data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.default_hostname,
