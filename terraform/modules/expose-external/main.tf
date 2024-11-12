@@ -50,6 +50,10 @@ resource "kubernetes_deployment_v1" "network" {
   }
 
   depends_on = [kubernetes_namespace_v1.this]
+
+  lifecycle {
+    ignore_changes = [spec[0].template[0].metadata[0].annotations["kubectl.kubernetes.io/restartedAt"]]
+  }
 }
 
 resource "kubernetes_service_v1" "network" {
@@ -86,6 +90,7 @@ resource "kubernetes_config_map_v1" "nginx-config" {
 resource "kubernetes_namespace_v1" "this" {
   count = var.create_namespace ? 1 : 0
   metadata {
-    name = var.namespace
+    name   = var.namespace
+    labels = var.namespace_labels
   }
 }

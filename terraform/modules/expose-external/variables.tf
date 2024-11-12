@@ -11,6 +11,17 @@ variable "namespace" {
   nullable    = false
 }
 
+variable "namespace_labels" {
+  description = "Labels to add to the namespace (if created)"
+  type        = map(string)
+  default     = null
+
+  validation {
+    condition     = var.namespace_labels != null ? var.create_namespace == true : true
+    error_message = "Cannot set namespace_labels if create_namespace is false"
+  }
+}
+
 variable "create_namespace" {
   description = "Whether to create the namespace if it does not exist"
   type        = bool
