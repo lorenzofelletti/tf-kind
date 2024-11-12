@@ -6,6 +6,8 @@ MINIO_ENV_FILE = .env
 MINIO_DEFAULT_ENV_FILE = default.env
 MINIO_CREDENTIALS_FILE = credentials.json
 
+KUSTOMIZE_DIR = kustomize
+
 TERRAFORM_DIR = terraform
 TERRAFORM_KIND_CLUSTER_DIR = $(TERRAFORM_DIR)/kind-cluster
 TERRAFORM_OBSERVABILITY_DIR = $(TERRAFORM_DIR)/observability
@@ -28,6 +30,14 @@ minio-up:
 .PHONY: minio-down
 minio-down:
 	cd $(MINIO_DIR); docker-compose down
+
+.PHONY: kustomize-apply
+kustomize-apply:
+	kustomize build $(KUSTOMIZE_DIR) --enable-helm | kubectl apply -f -
+
+.PHONY: kustomize
+kustomize:
+	kustomize build $(KUSTOMIZE_DIR) --enable-helm
 
 
 .PHONY: tf-backend-config
