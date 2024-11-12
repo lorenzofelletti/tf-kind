@@ -36,6 +36,9 @@ local_registry_spec = {
 
 expose_minio_in_cluster = {
   enabled = true
+  namespace_labels = {
+    "restricted" = "true"
+  }
 }
 
 calico_version = "v3.28.0"

@@ -69,6 +69,7 @@ module "expose-minio" {
   name             = "minio"
   namespace        = "minio"
   create_namespace = true
+  namespace_labels = var.expose_minio_in_cluster.namespace_labels
 
   ports              = "9000"
   nginx_default_conf = <<-EOT
