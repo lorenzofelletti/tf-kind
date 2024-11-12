@@ -1,0 +1,77 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: nokinddeletioninlabelednamespace
+  annotations:
+    metadata.gatekeeper.sh/title: Blocks a Kind deletion unless required via label, for selected namespaces
+    metadata.gatekeeper.sh/version: "1.0.0"
+    description: Blocks a Kind deletion unless explicitly required via label, for
+      selected namespaces
+spec:
+  crd:
+    spec:
+      names:
+        kind: NoKindDeletionInLabeledNamespace
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            apiGroup:
+              type: string
+            resourceKind:
+              type: string
+            namespaceLabelKey:
+              type: string
+            namespaceLabelValue:
+              type: string
+            deletableLabelKey:
+              type: string
+            deletableLabelValue:
+              type: string
+  targets:
+  - target: admission.k8s.gatekeeper.sh
+    rego: |
+      package nokinddeletioninlabelednamespace
+
+      violation[{"msg": msg }] {
+        input.review.operation == "DELETE"
+        input.review.kind.group == input.parameters.apiGroup
+        input.review.kind.kind == input.parameters.resourceKind
+        data.inventory.cluster["v1"].Namespace[input.review.namespace].metadata.labels[input.parameters.namespaceLabelKey] == input.parameters.namespaceLabelValue
+        not input.review.object.metadata.labels[input.parameters.deletableLabelKey] == input.parameters.deletableLabelValue
+        msg := sprintf("%s/%s in namespaces with label '%s: %s' can only be deleted if they have the label '%s: %s'", [input.parameters.apiGroup, input.parameters.resourceKind, input.parameters.namespaceLabelKey, input.parameters.namespaceLabelValue, input.parameters.deletableLabelKey, input.parameters.deletableLabelValue])
+      }
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: NoKindDeletionInLabeledNamespace
+metadata:
+  name: no-deployment-deletion-in-restricted-namespaces
+spec:
+  match:
+    kinds:
+    - apiGroups: [ "apps" ]
+      kinds: [ "Deployment" ]
+  parameters:
+    apiGroup: "apps"
+    resourceKind: Deployment
+    namespaceLabelKey: restricted
+    namespaceLabelValue: "true"
+    deletableLabelKey: deletable
+    deletableLabelValue: "true"
+---
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: NoKindDeletionInLabeledNamespace
+metadata:
+  name: no-statefulset-deletion-in-restricted-namespaces
+spec:
+  match:
+    kinds:
+    - apiGroups: [ "apps" ]
+      kinds: [ "StatefulSet" ]
+  parameters:
+    apiGroup: "apps"
+    resourceKind: StatefulSet
+    namespaceLabelKey: restricted
+    namespaceLabelValue: "true"
+    deletableLabelKey: deletable
+    deletableLabelValue: "true"
