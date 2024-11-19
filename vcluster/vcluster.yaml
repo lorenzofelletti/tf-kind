@@ -1,0 +1,22 @@
+controlPlane:
+  proxy:
+    extraSANs:
+    - vtest-vcluster.local.io
+  ingress:
+    enabled: true
+    host: vtest-vcluster.local.io
+    spec:
+      ingressClassName: nginx
+sync:
+  toHost:
+    serviceAccounts:
+      enabled: true
+  fromHost:
+    nodes:
+      enabled: true
+      clearImageStatus: true
+exportKubeConfig:
+  context: vtest-context
+  server: https://vtest-vcluster.local.io:443
+  secret:
+    name: vtest-kubeconfig
