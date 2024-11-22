@@ -22,6 +22,10 @@ terraform {
       source  = "logicorg/logic"
       version = "~> 0.1.0"
     }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0.0"
+    }
   }
 
   backend "s3" {}
@@ -35,7 +39,7 @@ provider "kind" {}
 
 provider "kubernetes" {
   config_path    = kind_cluster.this.kubeconfig_path
-  config_context = "kind-${kind_cluster.this.name}"
+  # config_context = "kind-${kind_cluster.this.name}"
 }
 
 provider "minio" {
@@ -43,3 +47,5 @@ provider "minio" {
   minio_user     = module.minio-provider.configuration.access_key
   minio_password = module.minio-provider.configuration.secret_key
 }
+
+provider "tls" {}

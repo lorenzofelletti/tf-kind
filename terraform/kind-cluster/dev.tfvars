@@ -1,6 +1,6 @@
 cluster_spec = {
   name        = "observability-test"
-  k8s_version = "1.30.0"
+  k8s_version = "1.31.2"
   networking = {
     ip_family           = "ipv4"
     disable_default_cni = true
@@ -38,6 +38,18 @@ expose_minio_in_cluster = {
   enabled = true
   namespace_labels = {
     "restricted" = "true"
+  }
+}
+
+pre_provisioned_self_signed_tls_certificates = {
+  "local_io" = {
+    secret_name      = "tls"
+    secret_namespace = "vtest-cluster"
+    dns_names        = ["*.local.io"]
+    subject = {
+      common_name  = "*.local.io"
+      organization = "Local Kubernetes"
+    }
   }
 }
 

@@ -41,7 +41,7 @@ resource "kubernetes_deployment_v1" "network" {
         volume {
           name = "nginx-conf"
           config_map {
-            name         = kubernetes_config_map_v1.nginx-config.metadata[0].name
+            name         = kubernetes_config_map_v1.nginx_config.metadata[0].name
             default_mode = "0644"
           }
         }
@@ -77,7 +77,7 @@ resource "kubernetes_service_v1" "network" {
   }
 }
 
-resource "kubernetes_config_map_v1" "nginx-config" {
+resource "kubernetes_config_map_v1" "nginx_config" {
   metadata {
     name      = "nginx-config"
     namespace = var.namespace
@@ -93,4 +93,9 @@ resource "kubernetes_namespace_v1" "this" {
     name   = var.namespace
     labels = var.namespace_labels
   }
+}
+
+moved {
+  from = kubernetes_config_map_v1.nginx-config
+  to   = kubernetes_config_map_v1.nginx_config
 }

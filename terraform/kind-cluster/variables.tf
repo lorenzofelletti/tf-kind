@@ -176,3 +176,23 @@ variable "kubeconfig_upload_bucket_name" {
   description = "The name of the bucket to upload the kubeconfig to. If not set, the kubeconfig will not be uploaded."
   type        = string
 }
+
+variable "pre_provisioned_self_signed_tls_certificates" {
+  description = <<-EOT
+  Self-signed TLS certificates you want to pre-provision in the cluster in the form of Kubernetes secrets.
+  Note: Terraform need to manage the namespace where the secrets are created, but won't try to fight over
+  the metadata of it.
+  EOT
+  type = map(object({
+    secret_name      = string
+    secret_namespace = string
+    dns_names        = list(string)
+    subject = object({
+      common_name         = string
+      organization        = optional(string)
+      organizational_unit = optional(string)
+    })
+    validity_period_days = optional(number)
+  }))
+  default = {}
+}

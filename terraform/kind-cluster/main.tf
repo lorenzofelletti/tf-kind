@@ -72,31 +72,7 @@ module "expose-minio" {
   namespace_labels = var.expose_minio_in_cluster.namespace_labels
 
   ports              = "9000"
-  nginx_default_conf = <<-EOT
-  server {
-    listen 9000;
-    server_name host.docker.internal
-    # Allow special characters in headers
-    ignore_invalid_headers off;
-    # Allow any size file to be uploaded.
-    # Set to a value such as 1000m; to restrict file size to a specific value
-    client_max_body_size 0;
-    # Disable buffering
-    proxy_buffering off;
-    proxy_request_buffering off;
-
-    location / {
-      proxy_pass http://host.docker.internal:9000;
-      proxy_set_header Host $http_host;
-      #proxy_pass_request_headers off;
-      #proxy_buffering off;
-      chunked_transfer_encoding off;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-    }
-  }
-  EOT
+  nginx_default_conf = file("${path.module}/nginx-minio.conf")
 
   depends_on = [kind_cluster.this]
 }
@@ -110,115 +86,6 @@ module "calico" {
   calico_version     = var.calico_version
 
   additional_replace_trigger = [kind_cluster.this.kubeconfig]
-}
-
-resource "terraform_data" "kind_registry" {
-  count = var.deploy_local_registry ? 1 : 0
-
-  triggers_replace = [
-    sha256(kind_cluster.this.kubeconfig),
-    var.deploy_local_registry,
-    var.local_registry_spec.name,
-    var.local_registry_spec.registry_port,
-    var.local_registry_spec.registry_container_port,
-  ]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = <<-EOT
-    set -o errexit
-    reg_name=${var.local_registry_spec.name}
-    reg_port=${var.local_registry_spec.registry_port}
-    reg_container_port=${var.local_registry_spec.registry_container_port}
-
-    REGISTRY_DIR="/etc/containerd/certs.d/localhost:$${reg_port}"
-    for node in $(kind get nodes -n "${var.cluster_spec.name}"); do
-      docker exec "$${node}" mkdir -p "$${REGISTRY_DIR}"
-      cat <<EOF | docker exec -i "$${node}" cp /dev/stdin "$${REGISTRY_DIR}/hosts.toml"
-    [host."http://$${reg_name}:$${reg_container_port}"]
-    EOF
-    done
-    EOT
-    when        = create
-  }
-
-  depends_on = [kind_cluster.this, docker_container.registry]
-}
-
-resource "docker_network" "registry" {
-  count = var.deploy_local_registry ? 1 : 0
-
-  name   = var.local_registry_spec.name
-  driver = "bridge"
-}
-
-resource "docker_container" "registry" {
-  count = var.deploy_local_registry ? 1 : 0
-
-  name    = var.local_registry_spec.name
-  image   = "registry:2"
-  restart = "always"
-  ports {
-    internal = var.local_registry_spec.registry_container_port
-    external = var.local_registry_spec.registry_port
-  }
-  network_mode = "bridge"
-  networks_advanced {
-    name = docker_network.registry[0].name
-  }
-  networks_advanced {
-    name = "kind"
-  }
-  lifecycle {
-    ignore_changes = [image]
-  }
-}
-
-resource "kubernetes_config_map_v1" "document_registry" {
-  count = var.deploy_local_registry ? 1 : 0
-
-  metadata {
-    name      = "local-registry-hosting"
-    namespace = "kube-public"
-  }
-
-  data = {
-    "localRegistryHosting.v1" = <<-EOT
-    host: "localhost:${var.local_registry_spec.registry_port}"
-    help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-    EOT
-  }
-
-  depends_on = [kind_cluster.this]
-}
-
-resource "terraform_data" "ingress-nginx" {
-  count = var.cluster_spec.deploy_ingress_nginx ? 1 : 0
-
-  provisioner "local-exec" {
-    command = <<-EOT
-    set -euo pipefail
-
-    export KUBECONFIG=$KUBECONFIG
-    kubectl config use-context $CONTEXT
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
-
-    kubectl wait --namespace ingress-nginx \
-      --for=condition=ready pod \
-      --selector=app.kubernetes.io/component=controller \
-      --timeout=90s
-    EOT
-
-    environment = {
-      "KUBECONFIG" = local.kubeconfig_path
-      "CONTEXT"    = local.context_name
-    }
-
-    when       = create
-    on_failure = continue
-  }
-
-  triggers_replace = sha256(kind_cluster.this.kubeconfig)
 }
 
 module "upload_kubeconfig" {
@@ -235,3 +102,8 @@ module "minio-provider" {
   source         = "../modules/minio-provider-conf"
   minio_key_file = var.minio_key_file
 }
+
+# moved {
+#   from = terraform_data.ingress-nginx
+#   to   = terraform_data.ingress_nginx
+# }
