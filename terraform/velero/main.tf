@@ -34,6 +34,29 @@ resource "minio_s3_bucket" "velero_backups" {
   force_destroy = false
 }
 
+data "terraform_remote_state" "workloads" {
+  backend = "s3"
+
+  config = {
+    access_key = module.minio-provider.configuration.access_key
+    secret_key = module.minio-provider.configuration.secret_key
+
+    endpoints = {
+      s3 = var.workload_remote_state.endpoint
+    }
+
+    region                      = var.workload_remote_state.region
+    skip_credentials_validation = true
+    skip_metadata_api_check     = true
+    skip_region_validation      = true
+    skip_requesting_account_id  = true
+    use_path_style              = true
+
+    bucket = var.workload_remote_state.bucket
+    key    = var.workload_remote_state.key
+  }
+}
+
 ### --- Terraform Configuration --- ###
 data "terraform_remote_state" "cluster" {
   backend = "s3"

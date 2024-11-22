@@ -10,6 +10,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "~> 2.0"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0.2"
+    }
     minio = {
       source  = "aminueza/minio"
       version = "~> 2.4.0"
@@ -24,6 +28,8 @@ terraform {
 }
 
 provider "logic" {}
+
+provider "docker" {}
 
 provider "kubernetes" {
   config_path            = module.kube.configuration.config_path

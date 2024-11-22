@@ -52,6 +52,22 @@ variable "kubeconfig" {
   }
 }
 
+variable "workload_remote_state" {
+  description = "Remote state configuration for the workloads on the cluster."
+  type = object({
+    region   = string
+    endpoint = string
+    bucket   = string
+    key      = string
+  })
+  default = {
+    region   = "main"
+    endpoint = "http://localhost:9000"
+    bucket   = "terraform-states"
+    key      = "workloads/terraform.tfstate"
+  }
+}
+
 # Should be optional, but Terraform does not support optional providers
 variable "minio_key_file" {
   description = "Path to the file containing the MinIO access key and secret key"

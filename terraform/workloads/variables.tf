@@ -1,4 +1,19 @@
-
+variable "expose_minio_in_cluster" {
+  description = <<-EOT
+  Expose MinIO in the cluster
+  Fields:
+  - enabled: Enable exposing MinIO in the cluster (default: `false`)
+  - gateway: The gateway to use to expose MinIO in the cluster (optional)
+  - network: The network to use to expose MinIO in the cluster (optional)
+  - namespace_labels: labels to add to the created namespace (optional).
+  EOT
+  type = object({
+    enabled          = optional(bool, false)
+    gateway          = optional(string)
+    network          = optional(string)
+    namespace_labels = optional(map(string))
+  })
+}
 
 ### --- Terraform Configuration --- ###
 

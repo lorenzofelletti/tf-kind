@@ -1,4 +1,9 @@
-
+expose_minio_in_cluster = {
+  enabled = true
+  namespace_labels = {
+    "restricted" = "true"
+  }
+}
 
 ### --- Terraform Configuration --- ###
 

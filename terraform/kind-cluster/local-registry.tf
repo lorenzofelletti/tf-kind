@@ -59,21 +59,3 @@ resource "docker_container" "registry" {
     ignore_changes = [image]
   }
 }
-
-resource "kubernetes_config_map_v1" "document_registry" {
-  count = var.deploy_local_registry ? 1 : 0
-
-  metadata {
-    name      = "local-registry-hosting"
-    namespace = "kube-public"
-  }
-
-  data = {
-    "localRegistryHosting.v1" = <<-EOT
-    host: "localhost:${var.local_registry_spec.registry_port}"
-    help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-    EOT
-  }
-
-  depends_on = [kind_cluster.this]
-}

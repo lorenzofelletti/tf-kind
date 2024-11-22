@@ -34,25 +34,6 @@ local_registry_spec = {
   add_cluster_containerd_config_patch = true
 }
 
-expose_minio_in_cluster = {
-  enabled = true
-  namespace_labels = {
-    "restricted" = "true"
-  }
-}
-
-pre_provisioned_self_signed_tls_certificates = {
-  "local_io" = {
-    secret_name      = "tls"
-    secret_namespace = "vtest-cluster"
-    dns_names        = ["*.local.io"]
-    subject = {
-      common_name  = "*.local.io"
-      organization = "Local Kubernetes"
-    }
-  }
-}
-
 calico_version = "v3.28.0"
 
 kubeconfig_path = "~/.kube/kind-config"
