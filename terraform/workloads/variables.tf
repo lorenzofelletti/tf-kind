@@ -1,17 +1,18 @@
-variable "velero" {
-  description = "Velero chart configuration"
+variable "expose_minio_in_cluster" {
+  description = <<-EOT
+  Expose MinIO in the cluster
+  Fields:
+  - enabled: Enable exposing MinIO in the cluster (default: `false`)
+  - gateway: The gateway to use to expose MinIO in the cluster (optional)
+  - network: The network to use to expose MinIO in the cluster (optional)
+  - namespace_labels: labels to add to the created namespace (optional).
+  EOT
   type = object({
-    version     = string
-    values      = optional(list(string), [])
-    values_file = optional(string)
+    enabled          = optional(bool, false)
+    gateway          = optional(string)
+    network          = optional(string)
+    namespace_labels = optional(map(string))
   })
-}
-
-variable "bucket_name" {
-  description = "The name of the bucket where Velero backups will be stored."
-  type        = string
-  default     = "velero-backups"
-  nullable    = false
 }
 
 ### --- Terraform Configuration --- ###
@@ -52,22 +53,6 @@ variable "kubeconfig" {
   }
 }
 
-variable "workload_remote_state" {
-  description = "Remote state configuration for the workloads on the cluster."
-  type = object({
-    region   = string
-    endpoint = string
-    bucket   = string
-    key      = string
-  })
-  default = {
-    region   = "main"
-    endpoint = "http://localhost:9000"
-    bucket   = "terraform-states"
-    key      = "workloads/terraform.tfstate"
-  }
-}
-
 # Should be optional, but Terraform does not support optional providers
 variable "minio_key_file" {
   description = "Path to the file containing the MinIO access key and secret key"
@@ -78,20 +63,4 @@ variable "minio_server" {
   description = "The MinIO server to use (e.g. localhost:9000)"
   type        = string
   default     = "localhost:9000"
-}
-
-variable "cluster_remote_state" {
-  description = "Remote state configuration for the cluster."
-  type = object({
-    region   = string
-    endpoint = string
-    bucket   = string
-    key      = string
-  })
-  default = {
-    region   = "main"
-    endpoint = "http://localhost:9000"
-    bucket   = "terraform-states"
-    key      = "kind-cluster/terraform.tfstate"
-  }
 }

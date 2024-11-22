@@ -11,7 +11,7 @@ locals {
     plugin_version  = "v1.10.1",
     backup_bucket   = var.bucket_name,
     minio_region    = "main",
-    velero_svc_host = data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.default_hostname,
-    velero_svc_port = data.terraform_remote_state.cluster.outputs.minio_kubernetes_service.ports[0].port
+    velero_svc_host = data.terraform_remote_state.workloads.outputs.minio_kubernetes_service.default_hostname,
+    velero_svc_port = data.terraform_remote_state.workloads.outputs.minio_kubernetes_service.ports[0].port
   })]
 }

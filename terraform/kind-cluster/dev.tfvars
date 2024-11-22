@@ -1,6 +1,6 @@
 cluster_spec = {
   name        = "observability-test"
-  k8s_version = "1.30.0"
+  k8s_version = "1.31.2"
   networking = {
     ip_family           = "ipv4"
     disable_default_cni = true
@@ -32,13 +32,6 @@ cluster_spec = {
 deploy_local_registry = true
 local_registry_spec = {
   add_cluster_containerd_config_patch = true
-}
-
-expose_minio_in_cluster = {
-  enabled = true
-  namespace_labels = {
-    "restricted" = "true"
-  }
 }
 
 calico_version = "v3.28.0"

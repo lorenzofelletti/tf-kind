@@ -137,23 +137,6 @@ variable "calico_version" {
   }
 }
 
-variable "expose_minio_in_cluster" {
-  description = <<-EOT
-  Expose MinIO in the cluster
-  Fields:
-  - enabled: Enable exposing MinIO in the cluster (default: `false`)
-  - gateway: The gateway to use to expose MinIO in the cluster (optional)
-  - network: The network to use to expose MinIO in the cluster (optional)
-  - namespace_labels: labels to add to the created namespace (optional).
-  EOT
-  type = object({
-    enabled          = optional(bool, false)
-    gateway          = optional(string)
-    network          = optional(string)
-    namespace_labels = optional(map(string))
-  })
-}
-
 variable "kubeconfig_path" {
   description = "Path to kubeconfig file"
   type        = string
@@ -175,4 +158,24 @@ variable "minio_server" {
 variable "kubeconfig_upload_bucket_name" {
   description = "The name of the bucket to upload the kubeconfig to. If not set, the kubeconfig will not be uploaded."
   type        = string
+}
+
+variable "pre_provisioned_self_signed_tls_certificates" {
+  description = <<-EOT
+  Self-signed TLS certificates you want to pre-provision in the cluster in the form of Kubernetes secrets.
+  Note: Terraform need to manage the namespace where the secrets are created, but won't try to fight over
+  the metadata of it.
+  EOT
+  type = map(object({
+    secret_name      = string
+    secret_namespace = string
+    dns_names        = list(string)
+    subject = object({
+      common_name         = string
+      organization        = optional(string)
+      organizational_unit = optional(string)
+    })
+    validity_period_days = optional(number)
+  }))
+  default = {}
 }
