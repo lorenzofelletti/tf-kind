@@ -18,6 +18,9 @@ TF_BACKEND_CFG_TPL = tpl-config.s3.tfbackend
 TF_BACKEND_CFG_NAME=config.s3.tfbackend
 TF_PLAN_FILE = terraform.tfplan
 
+# sync default with kind-cluster dev.tfvars value
+KUBECONFIG=$${HOME}/.kube/kind-config
+
 .PHONY: minio-up
 minio-up:
 	@cd $(MINIO_DIR); if [[ -f $(MINIO_ENV_FILE) ]]; then \
@@ -34,11 +37,11 @@ minio-down:
 
 .PHONY: kustomize-apply
 kustomize-apply:
-	kustomize build $(KUSTOMIZE_DIR) --enable-helm | kubectl apply -f -
+	export KUBECONFIG=$(KUBECONFIG); kustomize build $(KUSTOMIZE_DIR) --enable-helm | kubectl apply -f -
 
 .PHONY: kustomize
 kustomize:
-	kustomize build $(KUSTOMIZE_DIR) --enable-helm
+	export KUBECONFIG=$(KUBECONFIG); kustomize build $(KUSTOMIZE_DIR) --enable-helm
 
 
 .PHONY: tf-backend-config
