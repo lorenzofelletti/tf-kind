@@ -1,6 +1,8 @@
 # Local Kubernetes cluster with Prometheus, Grafana, and Velero
 > The most convoluted, and over-engineered way to spin up a local Kubernetes cluster.
 
+> tl;dr: Run `make yolo-buildout`, `export KUBECONFIG=~/.kube/kind-config`, and explore the cluster.
+
 Spin up a Kubernetes cluster with Prometheus, Grafana, and Velero installed using Docker, and Terraform.
 The repo provides IaC to create a Kubernetes cluster using Kind, but the Prometheus and Grafana setup can be used with any Kubernetes cluster. The Velero setup is mildly coupled with the Kind cluster, so it is not that portable.
 
@@ -45,6 +47,14 @@ Once that the cluster is created, run the following command to set up Prometheus
 make init STACK=observability ARGS="-backend-config=config.s3.tfbackend"
 make plan STACK=observability ARGS="-var-file=dev.tfvars"
 make apply STACK=observability
+```
+
+### Setup Workloads
+Once that the cluster is created, run the following command to set up the workloads:
+```bash
+make init STACK=workloads ARGS="-backend-config=config.s3.tfbackend"
+make plan STACK=workloads ARGS="-var-file=dev.tfvars"
+make apply STACK=workloads
 ```
 
 ### Setup Velero
