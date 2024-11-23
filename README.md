@@ -1,4 +1,4 @@
-# Local Kubernetes cluster with Prometheus, Grafana, and Velero
+# Local Kubernetes cluster with Prometheus, Grafana, and More
 > The most convoluted, and over-engineered way to spin up a local Kubernetes cluster.
 
 > tl;dr: Run `make yolo-buildout`, `export KUBECONFIG=~/.kube/kind-config`, and explore the cluster.
@@ -64,6 +64,23 @@ make init STACK=velero ARGS="-backend-config=config.s3.tfbackend"
 make plan STACK=velero ARGS="-var-file=dev.tfvars"
 make apply STACK=velero
 ```
+
+## Local Networking
+How to setup local DNS resolution for local.io
+```bash
+brew install dnsmasq
+sudo brew services start dnsmasq
+# create config directory
+mkdir -pv $(brew --prefix)/etc/
+# resolve local.io to 127.0.0.1
+echo 'address=/local.io/127.0.0.1' >> $(brew --prefix)/etc/dnsmasq.conf
+echo 'port=53' >> $(brew --prefix)/etc/dnsmasq.conf
+# add it to resolvers (run `sudo mkdir /etc/resolver` if it doesn't exist)
+sudo bash -c 'echo "nameserver 127.0.0.1" > /etc/resolver/local.io'
+```
+
+An alternative, should this not be working is to choose a different name like `internal` instead of `local.io`.
+Or, you can edit `/private/etc/hosts` adding `127.0.0.1 local.io`.
 
 ---
 ## Example IAM Setup
