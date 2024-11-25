@@ -2,7 +2,6 @@ variable "namespace" {
   description = "Namespace where the Ingress Nginx controller will be deployed"
   type        = string
   default     = "ingress-nginx"
-
 }
 
 variable "service_account_name" {
