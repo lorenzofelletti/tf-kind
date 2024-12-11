@@ -5,6 +5,6 @@ namespace=$1-vcluster
 kubectl create namespace $namespace
 
 clusterctl generate cluster $1 \
-    --infrastructure vcluster \
+    --infrastructure vcluster:v0.2.0 \
     --target-namespace $namespace \
     | kubectl apply -f -
