@@ -3,6 +3,10 @@ resource "kubernetes_namespace_v1" "this" {
     name   = var.namespace
     labels = local.labels
   }
+
+  lifecycle {
+    ignore_changes = [metadata[0].labels, metadata[0].annotations]
+  }
 }
 
 resource "kubernetes_config_map_v1" "ingress_nginx_controller" {

@@ -24,4 +24,8 @@ resource "kubernetes_validating_webhook_configuration_v1" "ingress_nginx_admissi
       resources    = ["ingresses"]
     }
   }
+
+  lifecycle {
+    ignore_changes = [webhook[0].client_config[0].ca_bundle]
+  }
 }

@@ -1,10 +1,10 @@
 controlPlane:
   proxy:
     extraSANs:
-    - vtest-cluster.local.io
+    - ${CLUSTER_NAMESPACE}.${LOCAL_DOMAIN}
   ingress:
     enabled: true
-    host: vtest-cluster.local.io
+    host: ${CLUSTER_NAMESPACE}.${LOCAL_DOMAIN}
     spec:
       ingressClassName: nginx
 sync:
@@ -16,7 +16,6 @@ sync:
       enabled: true
       clearImageStatus: true
 exportKubeConfig:
-  context: vtest-context
-  server: https://vtest-cluster.local.io:443
+  server: https://${CLUSTER_NAMESPACE}.${LOCAL_DOMAIN}:443
   secret:
-    name: vtest-ext-kubeconfig
+    name: ${CLUSTER_NAME}-ext-kubeconfig
