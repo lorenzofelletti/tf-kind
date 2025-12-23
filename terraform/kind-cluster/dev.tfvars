@@ -1,6 +1,6 @@
 cluster_spec = {
   name        = "observability-test"
-  k8s_version = "1.31.2"
+  k8s_version = "v1.35.0"
   networking = {
     ip_family           = "ipv4"
     disable_default_cni = true
@@ -23,9 +23,6 @@ cluster_spec = {
         }
       ]
     },
-    "w1" = {
-      role = "worker"
-    },
   }
 }
 
@@ -34,7 +31,7 @@ local_registry_spec = {
   add_cluster_containerd_config_patch = true
 }
 
-calico_version = "v3.28.0"
+calico_version = "v3.31.3"
 
 kubeconfig_path = "~/.kube/kind-config"
 
